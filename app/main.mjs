@@ -1,71 +1,79 @@
-import { 
-  Client,
-  GatewayIntentBits,
-  Events,
-  REST,
-  Routes,
-  SlashCommandBuilder
-} from "discord.js";
-import http from "http";
+// bot.js
+import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
+import 'dotenv/config';
 
-//
-// ダミーWebサーバー（常駐用）
-//
-const PORT = process.env.PORT || 8000;
-http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.end("OK");
-}).listen(PORT, () => {
-  console.log(`Dummy web server running on port ${PORT}`);
-});
+// ----------------------
+// 環境変数
+// ----------------------
+const TOKEN = process.env.BOT_TOKEN;
+const CLIENT_ID = process.env.CLIENT_ID;
+const GUILD_ID = process.env.GUILD_ID; // 開発用サーバーID
 
-//
-// Discord Bot
-//
-const client = new Client({
-  intents: [GatewayIntentBits.Guilds],
-});
+if (!TOKEN || !CLIENT_ID || !GUILD_ID) {
+  console.error("環境変数 BOT_TOKEN, CLIENT_ID, GUILD_ID を設定してください");
+  process.exit(1);
+}
 
-//
-// スラッシュコマンド定義
-//
+// ----------------------
+// サーバー限定コマンド定義
+// ----------------------
 const commands = [
-  new SlashCommandBuilder()
-    .setName("ping")
-    .setDescription("疎通確認用コマンド")
-    .toJSON()
+  {
+    name: 'ping',
+    description: 'Botの応答速度を確認します'
+  },
+  {
+    name: 'say',
+    description: 'BOTにメッセージを言わせます',
+    options: [
+      {
+        name: 'message',
+        type: 3, // STRING
+        description: 'BOTに言わせたいメッセージ',
+        required: true,
+      },
+    ],
+  },
 ];
 
-//
-// 起動時処理
-//
-client.once(Events.ClientReady, async () => {
-  console.log(`✅ Logged in as ${client.user.tag}`);
+// ----------------------
+// コマンド登録
+// ----------------------
+const rest = new REST({ version: '10' }).setToken(TOKEN);
 
-  // コマンド登録
-  const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
-
+(async () => {
   try {
-    console.log("⏳ スラッシュコマンド登録中...");
+    console.log('サーバー限定コマンドを登録中...');
     await rest.put(
-      Routes.applicationCommands(process.env.CLIENT_ID),
+      Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
       { body: commands }
     );
-    console.log("✅ スラッシュコマンド登録完了");
-  } catch (error) {
-    console.error("❌ コマンド登録失敗:", error);
+    console.log('コマンド登録完了！');
+  } catch (err) {
+    console.error('コマンド登録エラー:', err);
   }
+})();
+
+// ----------------------
+// BOT本体
+// ----------------------
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+client.once('ready', () => {
+  console.log(`Logged in as ${client.user.tag}`);
 });
 
-//
-// コマンド処理
-//
-client.on(Events.InteractionCreate, async interaction => {
+client.on('interactionCreate', async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  if (interaction.commandName === "ping") {
-    await interaction.reply("Pong! 🏓");
+  const { commandName } = interaction;
+
+  if (commandName === 'ping') {
+    await interaction.reply('Pong! 🏓');
+  } else if (commandName === 'say') {
+    const message = interaction.options.getString('message');
+    await interaction.reply(message);
   }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(TOKEN);
