@@ -9,7 +9,7 @@ COPY package*.json ./
 
 # 4. FFmpeg と必要なライブラリをインストール
 RUN apt-get update && \
-    apt-get install -y ffmpeg && \
+    apt-get install -y ffmpeg python3 python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
 # 5. npm install で依存関係をインストール
