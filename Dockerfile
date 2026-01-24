@@ -1,17 +1,7 @@
-# Node.jsのバージョン、変える事。
-FROM node:18
-
-# 作業ディレクトリを /app に
+FROM node:18-bullseye
 WORKDIR /app
-
-# app フォルダ内の内容をコンテナの /app にコピー
-COPY app/ .
-
-# 依存関係のインストール
+COPY package*.json ./
+RUN apt-get update && apt-get install -y ffmpeg
 RUN npm install
-
-# ポートを開ける（Koyeb用）、使用してるポート番号にすること。
-EXPOSE 3000
-
-# アプリの起動、コマンドを指定しよう。index.jsなら"node", "index.js"
+COPY . .
 CMD ["node", "main.mjs"]
