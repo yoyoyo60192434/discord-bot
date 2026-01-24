@@ -72,4 +72,3 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.login(TOKEN);
-🔹 Renderでの設定方法
