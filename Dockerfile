@@ -1,22 +1,18 @@
-# 1. ベースイメージ
 FROM node:18-bullseye
 
-# 2. 作業ディレクトリを作成
 WORKDIR /app
 
-# 3. パッケージファイルを先にコピー（依存関係のキャッシュ活用）
 COPY package*.json ./
 
-# 4. FFmpeg と必要なライブラリをインストール
+# 必要なライブラリと Python をインストール
 RUN apt-get update && \
-    apt-get install -y ffmpeg python3 python3-pip && \
+    apt-get install -y ffmpeg python3 python3-pip python-is-python3 && \
     rm -rf /var/lib/apt/lists/*
 
-# 5. npm install で依存関係をインストール
+# npm install で依存関係をインストール
 RUN npm install
 
-# 6. 残りのソースコードをコピー
+# ソースコードをコピー
 COPY . .
 
-# 7. ボット起動
 CMD ["node", "main.mjs"]
