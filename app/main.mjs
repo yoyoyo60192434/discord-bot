@@ -1,13 +1,11 @@
-// bot.js
 import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
-import 'dotenv/config';
 
 // ----------------------
 // 環境変数
 // ----------------------
 const TOKEN = process.env.BOT_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
-const GUILD_ID = process.env.GUILD_ID; // 開発用サーバーID
+const GUILD_ID = process.env.GUILD_ID;
 
 if (!TOKEN || !CLIENT_ID || !GUILD_ID) {
   console.error("環境変数 BOT_TOKEN, CLIENT_ID, GUILD_ID を設定してください");
@@ -18,10 +16,7 @@ if (!TOKEN || !CLIENT_ID || !GUILD_ID) {
 // サーバー限定コマンド定義
 // ----------------------
 const commands = [
-  {
-    name: 'ping',
-    description: 'Botの応答速度を確認します'
-  },
+  { name: 'ping', description: 'Botの応答速度を確認します' },
   {
     name: 'say',
     description: 'BOTにメッセージを言わせます',
@@ -77,3 +72,4 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.login(TOKEN);
+🔹 Renderでの設定方法
