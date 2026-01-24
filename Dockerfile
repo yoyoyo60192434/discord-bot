@@ -1,7 +1,10 @@
+# Node.js 18 Bullseye ベース
 FROM node:18-bullseye
 
+# 作業ディレクトリ
 WORKDIR /app
 
+# 依存関係のみ先にコピー
 COPY package*.json ./
 
 # 必要なライブラリと Python をインストール
@@ -12,7 +15,8 @@ RUN apt-get update && \
 # npm install で依存関係をインストール
 RUN npm install
 
-# ソースコードをコピー
+# 残りのソースコードをコピー
 COPY . .
 
+# ボット起動
 CMD ["node", "main.mjs"]
